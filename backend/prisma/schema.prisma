@@ -1,0 +1,131 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum UserRole {
+  PATIENT
+  DOCTOR
+  NURSE
+  ADMIN
+}
+
+model AuditLog {
+  id         String   @id @default(cuid())
+  actorId    String? 
+  actorRole  String?
+  action     String
+  targetType String?
+  targetId   String?
+  success    Boolean  @default(true)
+  timestamp  DateTime @default(now())
+  ip         String?
+  userAgent  String?
+  metadata   Json?
+  @@index([actorId])
+  @@index([targetType, targetId])
+  @@index([timestamp])
+}
+
+model PasswordResetCode {
+  userId    String  @id
+  user      User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  code      String
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+}
+
+model User {
+  id        String   @id @default(uuid())
+  name      String
+  email     String   @unique
+  password  String
+  role      UserRole @default(PATIENT)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  diagnosis String?
+  passwordUpdatedAt DateTime @default(now())
+
+
+  patientRecord PatientRecord?
+  passwordResetCode PasswordResetCode?
+  nurseAssignments  NurseAssignment[] @relation("NurseToDoctor")
+  doctorAssignments NurseAssignment[] @relation("DoctorToNurse")
+  doctorNotes   DoctorNote[]   @relation("DoctorNotes")
+  medicationChecks MedicationCheck[]
+
+
+  doctorPatients PatientRecord[] @relation("DoctorPatients")
+}
+
+model NurseAssignment {
+  id         String   @id @default(uuid())
+  nurseId    String
+  doctorId   String
+  createdAt  DateTime @default(now())
+  nurse     User    @relation("NurseToDoctor", fields: [nurseId], references: [id])
+  doctor    User    @relation("DoctorToNurse", fields: [doctorId], references: [id])
+
+  @@unique([nurseId, doctorId])
+}
+
+
+model PatientRecord {
+  id        String   @id @default(uuid())
+  patient   User     @relation(fields: [patientId], references: [id])
+  patientId String   @unique
+
+  doctor    User     @relation("DoctorPatients", fields: [doctorId], references: [id])
+  doctorId  String
+
+  createdAt DateTime @default(now())
+
+  doctorNotes  DoctorNote[]
+  medications  Medication[]
+}
+
+
+model DoctorNote {
+  id         String   @id @default(uuid())
+  doctor     User     @relation("DoctorNotes", fields: [doctorId], references: [id])
+  doctorId   String
+
+  record     PatientRecord @relation(fields: [recordId], references: [id])
+  recordId   String
+
+  note       String
+  createdAt  DateTime @default(now())
+}
+
+model Medication {
+  id         String   @id @default(uuid())
+  name       String
+  dosage     String
+  schedule   String   
+  
+  record     PatientRecord @relation(fields: [recordId], references: [id])
+  recordId   String
+
+  nurseChecks MedicationCheck[]
+}
+
+model MedicationCheck {
+  id           String   @id @default(uuid())
+  medication   Medication @relation(fields: [medicationId], references: [id])
+  medicationId String
+
+  nurse        User     @relation(fields: [nurseId], references: [id])
+  nurseId      String
+
+  checkedAt    DateTime @default(now())
+}
