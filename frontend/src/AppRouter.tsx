@@ -5,12 +5,14 @@ import DoctorDashboard from "./pages/DoctorDashboard";
 import NurseDashboard from "./pages/NurseDashboard";
 import PatientDashboard from "./pages/PatientDashboard";
 import { ProtectedRoute } from "./components/protectedRoute";
+import VerifyLoginPage from "./pages/verifyLoginPage";
 import ResetPassword from "./pages/ResetPassword";
 
 export default function AppRouter() {
   return (
     <Routes>
       <Route path="/login" element={<LoginPage />} />
+      <Route path="/verify-login" element={<VerifyLoginPage />} />
 
       <Route
         path="/admin"

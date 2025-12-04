@@ -1,3 +1,4 @@
+import { generateToken } from './../middleware/generateToken.middleware';
 import prisma from "../prisma";
 import { logger } from "../utils/logger";
 import bcrypt from "bcrypt";
@@ -202,6 +203,8 @@ export const loginService = async (
       throw new UnauthorizedError("Invalid email or password");
     }
 
+
+
     logger.info({ event: "LOGIN_SUCCESS", userId: user.id });
 
     await writeAuditLog({
@@ -234,3 +237,80 @@ export const loginService = async (
     throw err;
   }
 };
+
+export const initiateLoginService = async (
+  email: string,
+  password: string,
+  ip?: string,
+  userAgent?: string
+) => {
+  logger.info({ event: "LOGIN_ATTEMPT", email: maskEmail(email) });
+
+  const user = await prisma.user.findUnique({ where: { email } });
+
+  if (!user) {
+    logger.warn({ event: "LOGIN_FAILED_NOT_FOUND", email: maskEmail(email) });
+    throw new UnauthorizedError("Invalid email or password");
+  }
+
+  const isValid = await bcrypt.compare(password, user.password);
+  if (!isValid) {
+    logger.warn({
+      event: "LOGIN_FAILED_INVALID_PASSWORD",
+      email: maskEmail(email),
+    });
+    throw new UnauthorizedError("Invalid email or password");
+  }
+
+  // --- Generate 2FA code ---
+  const code = crypto.randomInt(100000, 999999).toString();
+  const expiresAt = new Date(Date.now() + 10 * 60 * 1000);
+
+  await prisma.loginCode.upsert({
+    where: { userId: user.id },
+    update: { code, expiresAt },
+    create: { userId: user.id, code, expiresAt },
+  });
+
+  console.log(`Login 2FA code for ${email}: ${code}`);
+
+  logger.info({ event: "LOGIN_2FA_CODE_SENT", userId: user.id });
+
+  return { message: "2FA code sent", step: "VERIFY_CODE", userId: user.id };
+};
+
+export const verifyLoginCodeService = async (
+  email: string,
+  code: string,
+  ip?: string,
+  userAgent?: string
+) => {
+  logger.info({ event: "LOGIN_2FA_VERIFY", email: maskEmail(email) });
+
+  const user = await prisma.user.findUnique({ where: { email } });
+
+  if (!user) throw new UnauthorizedError("Invalid login");
+
+  const entry = await prisma.loginCode.findUnique({
+    where: { userId: user.id },
+  });
+
+  if (!entry || entry.code !== code) {
+    throw new UnauthorizedError("Invalid or expired code");
+  }
+
+  if (entry.expiresAt < new Date()) {
+    throw new UnauthorizedError("Code expired");
+  }
+
+  await prisma.loginCode.delete({ where: { userId: user.id } });
+
+  logger.info({ event: "LOGIN_2FA_SUCCESS", userId: user.id });
+
+  return {
+    message: "Login successful",
+    token: generateToken(user),
+    role: user.role,
+  };
+};
+

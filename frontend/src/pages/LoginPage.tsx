@@ -13,7 +13,13 @@ function LoginPage() {
   const loginMutation = useMutation({
     mutationFn: loginRequest,
     onSuccess: (data) => {
-      console.log("Login successful:", data);
+      console.log("Login step result:", data);
+
+      if (data.step === "VERIFY_CODE") {
+        navigate("/verify-login", { state: { email } });
+        return;
+      }
+
       localStorage.setItem("token", data.token);
       localStorage.setItem("role", data.role.toUpperCase());
 
@@ -34,6 +40,7 @@ function LoginPage() {
           navigate("/login");
       }
     },
+
     onError: (error: any) => {
       console.error("Login failed:", error);
 
@@ -105,6 +112,7 @@ function LoginPage() {
             ))}
           </div>
         )}
+
         <h1
           className="text-center text-blue-400 hover:text-blue-600 p-4 hover:cursor-pointer"
           onClick={() => navigate("/reset-password")}
