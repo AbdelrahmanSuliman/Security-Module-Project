@@ -1,4 +1,5 @@
 import CreatePatientForm from "../components/CreatePatientForm";
+import { LogoutButton } from "../components/LogoutButton";
 import PatientList from "../components/PatientList";
 
 export default function DoctorDashboard() {
@@ -8,6 +9,7 @@ export default function DoctorDashboard() {
         <h1 className="text-4xl font-bold text-[#1F2937] mb-8 text-center">
           Doctor Dashboard
         </h1>
+        <LogoutButton/>
         <CreatePatientForm />
         <PatientList />
       </div>

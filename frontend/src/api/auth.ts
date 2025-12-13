@@ -12,3 +12,8 @@ export const verifyLoginRequest = async (data: {
   const res = await api.post("/auth/login/verify", data);
   return res.data;
 };
+
+export const logoutRequest = async () => {
+  const res = await api.post("/auth/logout");
+  return res.data;
+};

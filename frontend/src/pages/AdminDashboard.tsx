@@ -8,6 +8,7 @@ import {
   createNurse,
   deleteDoctor,
 } from "../api/admin";
+import { LogoutButton } from "../components/LogoutButton";
 
 type Doctor = {
   id: string;
@@ -143,10 +144,14 @@ export default function AdminDashboard() {
   return (
     <div className="min-h-screen bg-[#F7F9FC] p-6 md:p-8">
       <div className="max-w-7xl mx-auto space-y-6">
-        <h1 className="text-4xl font-bold text-[#1F2937] mb-8">Admin Dashboard</h1>
-
+        <h1 className="text-4xl font-bold text-[#1F2937] mb-8">
+          Admin Dashboard
+        </h1>
+        <LogoutButton />
         <section className="bg-white rounded-lg shadow-md p-6 md:p-8">
-          <h2 className="text-2xl font-semibold text-[#1F2937] mb-6">Manage Doctors</h2>
+          <h2 className="text-2xl font-semibold text-[#1F2937] mb-6">
+            Manage Doctors
+          </h2>
 
           <form
             onSubmit={handleCreateDoctor}
@@ -192,13 +197,17 @@ export default function AdminDashboard() {
 
           {errorDoctors && (
             <div className="mb-4 p-3 bg-[#E74C3C]/10 border border-[#E74C3C] rounded-lg">
-              <p className="text-[#E74C3C] text-sm font-medium">Failed to load doctors.</p>
+              <p className="text-[#E74C3C] text-sm font-medium">
+                Failed to load doctors.
+              </p>
             </div>
           )}
 
           <ul className="space-y-3">
             {doctors.length === 0 ? (
-              <li className="text-[#4B5563] text-center py-8">No doctors found.</li>
+              <li className="text-[#4B5563] text-center py-8">
+                No doctors found.
+              </li>
             ) : (
               doctors.map((doctor) => (
                 <li
@@ -223,7 +232,9 @@ export default function AdminDashboard() {
         </section>
 
         <section className="bg-white rounded-lg shadow-md p-6 md:p-8">
-          <h2 className="text-2xl font-semibold text-[#1F2937] mb-6">Manage Nurses</h2>
+          <h2 className="text-2xl font-semibold text-[#1F2937] mb-6">
+            Manage Nurses
+          </h2>
 
           <form
             onSubmit={handleCreateNurse}
@@ -286,13 +297,17 @@ export default function AdminDashboard() {
 
           {errorNurses && (
             <div className="mb-4 p-3 bg-[#E74C3C]/10 border border-[#E74C3C] rounded-lg">
-              <p className="text-[#E74C3C] text-sm font-medium">Failed to load nurses.</p>
+              <p className="text-[#E74C3C] text-sm font-medium">
+                Failed to load nurses.
+              </p>
             </div>
           )}
 
           <ul className="space-y-3">
             {nurses.length === 0 ? (
-              <li className="text-[#4B5563] text-center py-8">No nurses found.</li>
+              <li className="text-[#4B5563] text-center py-8">
+                No nurses found.
+              </li>
             ) : (
               nurses.map((nurse) => (
                 <li
@@ -304,7 +319,9 @@ export default function AdminDashboard() {
                     <span className="text-[#4B5563]">({nurse.email})</span>
                     {nurse.doctor && (
                       <p className="text-sm text-[#4B5563] mt-2">
-                        Assigned Doctor: <span className="font-medium">{nurse.doctor.name}</span> ({nurse.doctor.id})
+                        Assigned Doctor:{" "}
+                        <span className="font-medium">{nurse.doctor.name}</span>{" "}
+                        ({nurse.doctor.id})
                       </p>
                     )}
                   </div>
@@ -315,41 +332,54 @@ export default function AdminDashboard() {
         </section>
 
         <section className="bg-white rounded-lg shadow-md p-6 md:p-8">
-          <h2 className="text-2xl font-semibold text-[#1F2937] mb-6">Audit Logs</h2>
+          <h2 className="text-2xl font-semibold text-[#1F2937] mb-6">
+            Audit Logs
+          </h2>
 
           {errorLogs && (
             <div className="mb-4 p-3 bg-[#E74C3C]/10 border border-[#E74C3C] rounded-lg">
-              <p className="text-[#E74C3C] text-sm font-medium">Failed to load audit logs.</p>
+              <p className="text-[#E74C3C] text-sm font-medium">
+                Failed to load audit logs.
+              </p>
             </div>
           )}
 
           <div className="border border-[#D1D5DB] rounded-lg p-4 max-h-96 overflow-y-auto bg-[#F7F9FC]">
             {auditLogs.length === 0 ? (
-              <p className="text-[#4B5563] text-center py-8">No audit logs found.</p>
+              <p className="text-[#4B5563] text-center py-8">
+                No audit logs found.
+              </p>
             ) : (
               <ul className="space-y-4">
                 {auditLogs.map((log) => (
-                  <li key={log.id} className="border-b border-[#D1D5DB] pb-4 last:border-b-0 bg-white p-4 rounded-lg">
+                  <li
+                    key={log.id}
+                    className="border-b border-[#D1D5DB] pb-4 last:border-b-0 bg-white p-4 rounded-lg"
+                  >
                     <div className="space-y-2 text-sm">
                       <p>
                         <strong className="text-[#1F2937]">Action:</strong>{" "}
-                        <span className="font-mono text-[#0096C7] bg-[#ADE8F4]/20 px-2 py-1 rounded">{log.action}</span>
+                        <span className="font-mono text-[#0096C7] bg-[#ADE8F4]/20 px-2 py-1 rounded">
+                          {log.action}
+                        </span>
                       </p>
                       <p className="text-[#4B5563]">
-                        <strong className="text-[#1F2937]">Actor:</strong> {log.actorId || "N/A"} (
-                        {log.actorRole || "N/A"})
+                        <strong className="text-[#1F2937]">Actor:</strong>{" "}
+                        {log.actorId || "N/A"} ({log.actorRole || "N/A"})
                       </p>
                       <p className="text-[#4B5563]">
-                        <strong className="text-[#1F2937]">Target:</strong> {log.targetId || "N/A"} (
-                        {log.targetType || "N/A"})
+                        <strong className="text-[#1F2937]">Target:</strong>{" "}
+                        {log.targetId || "N/A"} ({log.targetType || "N/A"})
                       </p>
                       <p>
                         <strong className="text-[#1F2937]">Status:</strong>{" "}
-                        <span className={`inline-flex items-center px-2 py-1 rounded text-xs font-medium ${
-                          log.success 
-                            ? "bg-[#2ECC71]/10 text-[#2ECC71]" 
-                            : "bg-[#E74C3C]/10 text-[#E74C3C]"
-                        }`}>
+                        <span
+                          className={`inline-flex items-center px-2 py-1 rounded text-xs font-medium ${
+                            log.success
+                              ? "bg-[#2ECC71]/10 text-[#2ECC71]"
+                              : "bg-[#E74C3C]/10 text-[#E74C3C]"
+                          }`}
+                        >
                           {log.success ? "✅ Success" : "❌ Failed"}
                         </span>
                       </p>

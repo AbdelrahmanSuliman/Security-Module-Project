@@ -20,8 +20,6 @@ function LoginPage() {
         return;
       }
 
-      localStorage.setItem("token", data.token);
-      localStorage.setItem("role", data.role.toUpperCase());
 
       switch (data.role.toUpperCase()) {
         case "ADMIN":

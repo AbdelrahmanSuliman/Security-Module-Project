@@ -7,10 +7,12 @@ import adminRoutes from "./routes/admin.routes";
 import cors from "cors";
 import fs from "fs";
 import https from "https";
+import cookieParser from "cookie-parser";
 
 const app = express();
 const port = 3000;
-
+app.use(cookieParser());
+app.use(express.json());
 app.use(express.json());
 
 app.use(cors({

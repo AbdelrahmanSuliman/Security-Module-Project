@@ -123,7 +123,6 @@ export const resetPasswordService = async (
     where: { id: user.id },
     data: { password: hashedPassword },
   });
-  
 
   await prisma.passwordResetCode.delete({ where: { userId: user.id } });
 
@@ -143,7 +142,8 @@ export const resetPasswordService = async (
 
   return { message: "Password reset successfully" };
 };
-export const loginService = async (
+
+export const initiateLoginService = async (
   email: string,
   password: string,
   ip?: string,
@@ -153,12 +153,9 @@ export const loginService = async (
 
   try {
     const user = await prisma.user.findUnique({ where: { email } });
-    const THIRTY_DAYS_MS = 30 * 24 * 60 * 60 * 1000;
-    const now = new Date();
 
     if (!user) {
       logger.warn({ event: "LOGIN_FAILED_NOT_FOUND", email: maskEmail(email) });
-
       await writeAuditLog({
         actorId: undefined,
         actorRole: "UNKNOWN",
@@ -169,9 +166,11 @@ export const loginService = async (
         userAgent,
         metadata: { reason: "EMAIL_NOT_FOUND", email: encrypt(email) },
       });
-
       throw new UnauthorizedError("Invalid email or password");
     }
+
+    const THIRTY_DAYS_MS = 30 * 24 * 60 * 60 * 1000;
+    const now = new Date();
 
     if (
       !user.passwordUpdatedAt ||
@@ -188,7 +187,6 @@ export const loginService = async (
         event: "LOGIN_FAILED_INVALID_PASSWORD",
         email: maskEmail(email),
       });
-
       await writeAuditLog({
         actorId: user.id,
         actorRole: "USER",
@@ -200,81 +198,26 @@ export const loginService = async (
         userAgent,
         metadata: { reason: "INVALID_PASSWORD", email: encrypt(email) },
       });
-
       throw new UnauthorizedError("Invalid email or password");
     }
 
-    logger.info({ event: "LOGIN_SUCCESS", userId: user.id });
+    const code = crypto.randomInt(100000, 999999).toString();
+    const expiresAt = new Date(Date.now() + 10 * 60 * 1000);
 
-    await writeAuditLog({
-      actorId: user.id,
-      actorRole: "USER",
-      action: "LOGIN",
-      targetType: "USER",
-      targetId: user.id,
-      success: true,
-      ip,
-      userAgent,
-      metadata: { email: encrypt(email) },
+    await prisma.loginCode.upsert({
+      where: { userId: user.id },
+      update: { code, expiresAt },
+      create: { userId: user.id, code, expiresAt },
     });
 
-    return user;
+    console.log(`Login 2FA code for ${email}: ${code}`);
+    logger.info({ event: "LOGIN_2FA_CODE_SENT", userId: user.id });
+
+    return { message: "2FA code sent", step: "VERIFY_CODE", userId: user.id };
   } catch (err: any) {
     logger.error({ event: "LOGIN_ERROR", error: err });
-
-    await writeAuditLog({
-      actorId: undefined,
-      actorRole: "UNKNOWN",
-      action: "LOGIN",
-      targetType: "USER",
-      success: false,
-      ip,
-      userAgent,
-      metadata: { error: err.message, email: encrypt(email) },
-    });
-
     throw err;
   }
-};
-
-export const initiateLoginService = async (
-  email: string,
-  password: string,
-  ip?: string,
-  userAgent?: string
-) => {
-  logger.info({ event: "LOGIN_ATTEMPT", email: maskEmail(email) });
-
-  const user = await prisma.user.findUnique({ where: { email } });
-
-  if (!user) {
-    logger.warn({ event: "LOGIN_FAILED_NOT_FOUND", email: maskEmail(email) });
-    throw new UnauthorizedError("Invalid email or password");
-  }
-
-  const isValid = await bcrypt.compare(password, user.password);
-  if (!isValid) {
-    logger.warn({
-      event: "LOGIN_FAILED_INVALID_PASSWORD",
-      email: maskEmail(email),
-    });
-    throw new UnauthorizedError("Invalid email or password");
-  }
-
-  const code = crypto.randomInt(100000, 999999).toString();
-  const expiresAt = new Date(Date.now() + 10 * 60 * 1000);
-
-  await prisma.loginCode.upsert({
-    where: { userId: user.id },
-    update: { code, expiresAt },
-    create: { userId: user.id, code, expiresAt },
-  });
-
-  console.log(`Login 2FA code for ${email}: ${code}`);
-
-  logger.info({ event: "LOGIN_2FA_CODE_SENT", userId: user.id });
-
-  return { message: "2FA code sent", step: "VERIFY_CODE", userId: user.id };
 };
 
 export const verifyLoginCodeService = async (

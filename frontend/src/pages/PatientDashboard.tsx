@@ -1,5 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { getPatientData } from "../api/patient";
+import { LogoutButton } from "../components/LogoutButton";
 
 export default function PatientDashboard() {
   const { data, isLoading, isError } = useQuery({
@@ -45,6 +46,7 @@ export default function PatientDashboard() {
         <h1 className="text-4xl font-bold mb-8 text-[#1F2937]">
           Your Medical Records
         </h1>
+        <LogoutButton/>
 
         <div className="grid gap-6">
           {data.map((record: any) => (

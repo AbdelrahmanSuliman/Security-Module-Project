@@ -4,8 +4,10 @@ import { AppError } from "../utils/errors";
 import { generateToken } from "../middleware/generateToken.middleware";
 import { logger } from "../utils/logger";
 
-
-export const requestPasswordResetController = async (req: Request, res: Response) => {
+export const requestPasswordResetController = async (
+  req: Request,
+  res: Response
+) => {
   try {
     await authService.requestPasswordResetService(
       req.body.email,
@@ -79,11 +81,32 @@ export const verifyLoginCodeController = async (
       req.headers["user-agent"]
     );
 
-    return res.status(200).json(result);
+    res.cookie("token", result.token, {
+      httpOnly: true,
+      secure: true, 
+      sameSite: "none",
+      maxAge: 7 * 24 * 60 * 60 * 1000,
+      path: "/",
+    });
+
+    return res.status(200).json({
+      message: "Login successful",
+      role: result.role,
+    });
   } catch (err: any) {
     if (err instanceof AppError) {
       return res.status(err.statusCode).json({ message: err.message });
     }
     return res.status(500).json({ message: "Internal server error" });
   }
+};
+
+export const logoutController = (req: Request, res: Response) => {
+  res.clearCookie("token", {
+    httpOnly: true,
+    secure: true,
+    sameSite: "none",
+    path: "/",
+  });
+  return res.status(200).json({ message: "Logged out successfully" });
 };

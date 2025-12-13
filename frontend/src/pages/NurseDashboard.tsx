@@ -1,5 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { getAssignedPatients } from "../api/nurse";
+import { LogoutButton } from "../components/LogoutButton";
 
 export function NurseDashboard() {
   const { data: patients, isLoading, isError } = useQuery({
@@ -33,7 +34,7 @@ export function NurseDashboard() {
     <div className="min-h-screen bg-[#F7F9FC] p-6 md:p-8">
       <div className="max-w-5xl mx-auto">
         <h1 className="text-4xl font-bold text-[#1F2937] mb-8">Nurse Dashboard</h1>
-
+        <LogoutButton/>
         {patients.length === 0 ? (
           <div className="bg-white rounded-lg shadow-md p-8 text-center">
             <p className="text-[#4B5563] text-lg">No assigned patients.</p>
