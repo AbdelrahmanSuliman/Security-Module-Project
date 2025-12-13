@@ -2,6 +2,7 @@ import prisma from "../prisma";
 import { UnauthorizedError, NotFoundError } from "../utils/errors";
 import { logger } from "../utils/logger";
 import { writeAuditLog } from "../utils/audit";
+import { decrypt } from "../utils/encryptor";
 
 export const getPatientRecordsService = async (
   patientId: string,
@@ -59,6 +60,34 @@ export const getPatientRecordsService = async (
       },
     },
   });
+  const decryptedRecords = records.map((r) => ({
+    ...r,
+    patient: {
+      ...r.patient,
+      name: decrypt(r.patient.name),
+      diagnosis: decrypt(r.patient.diagnosis),
+    },
+    doctor: {
+      ...r.doctor,
+      name: decrypt(r.doctor.name),
+      email: r.doctor.email, 
+    },
+    doctorNotes: r.doctorNotes.map((n) => ({
+      ...n,
+      note: decrypt(n.note),
+      doctor: { ...n.doctor, name: decrypt(n.doctor.name) },
+    })),
+    medications: r.medications.map((m) => ({
+      ...m,
+      name: decrypt(m.name),
+      dosage: decrypt(m.dosage),
+      schedule: decrypt(m.schedule),
+      nurseChecks: m.nurseChecks.map((c) => ({
+        ...c,
+        nurse: { ...c.nurse, name: decrypt(c.nurse.name) },
+      })),
+    })),
+  }));
 
   await writeAuditLog({
     actorId: patientId,
@@ -72,5 +101,5 @@ export const getPatientRecordsService = async (
     metadata: { recordCount: records.length },
   });
 
-  return records;
+  return decryptedRecords;
 };

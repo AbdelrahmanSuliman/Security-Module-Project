@@ -171,7 +171,7 @@ export const createPatientService = async (
     const newPatient = await prisma.user.create({
       data: {
         name: encrypt(patientData.name),
-        email: encrypt(patientData.email),
+        email: patientData.email,
         diagnosis: encrypt(patientData.diagnosis ?? "Not provided"),
         password: hashedPassword,
         passwordUpdatedAt: new Date(),

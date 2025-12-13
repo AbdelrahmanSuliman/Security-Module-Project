@@ -33,7 +33,7 @@ export const createDoctorService = async (
     const doctor = await prisma.user.create({
       data: {
         name: encrypt(name),
-        email: encrypt(email),
+        email: email,
         password: hashed,
         role: "DOCTOR",
         passwordUpdatedAt: new Date(),
@@ -106,7 +106,7 @@ export const createNurseService = async (
     const nurse = await prisma.user.create({
       data: {
         name: encrypt(name),
-        email: encrypt(email),
+        email: email,
         password: hashed,
         role: "NURSE",
         passwordUpdatedAt: new Date(),
@@ -194,7 +194,7 @@ export const getAllDoctorsService = async (
     const decryptedDoctors = doctors.map((d) => ({
       ...d,
       name: decrypt(d.name),
-      email: decrypt(d.email),
+      email: d.email,
       doctorAssignments: d.doctorAssignments.map((a) => ({
         ...a,
         nurse: {

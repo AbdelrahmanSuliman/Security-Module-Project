@@ -24,25 +24,32 @@ function VerifyLoginPage() {
   });
 
   return (
-    <div className="flex items-center justify-center h-screen">
-      <div className="border p-8 rounded shadow w-96">
-        <h1 className="text-xl mb-4 text-center">Enter 2FA Code</h1>
+    <div className="flex items-center justify-center h-screen bg-[#F7F9FC]">
+      <div className="border border-[#D1D5DB] p-8 md:p-10 rounded-lg shadow-md w-full max-w-md bg-white">
+        <h1 className="text-3xl font-bold text-[#1F2937] mb-6 text-center">Enter 2FA Code</h1>
 
         <input
-          className="border p-2 w-full rounded"
+          className="border border-[#D1D5DB] p-3 w-full rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0096C7] focus:border-transparent text-[#1F2937] placeholder:text-[#4B5563] transition-all"
           placeholder="6-digit code"
           value={code}
           onChange={(e) => setCode(e.target.value)}
+          maxLength={6}
+          required
         />
 
         <button
           onClick={() => verifyMutation.mutate({ email, code })}
-          className="bg-blue-500 text-white w-full p-2 rounded mt-4"
+          className="bg-[#0096C7] hover:bg-[#023E8A] text-white w-full p-3 rounded-lg mt-5 font-medium transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed shadow-sm hover:shadow-md"
+          disabled={verifyMutation.isPending || !code}
         >
-          Verify
+          {verifyMutation.isPending ? "Verifying..." : "Verify"}
         </button>
 
-        {error && <p className="text-red-500 text-center mt-4">{error}</p>}
+        {error && (
+          <div className="mt-5 p-3 bg-[#E74C3C]/10 border border-[#E74C3C] rounded-lg">
+            <p className="text-[#E74C3C] text-center text-sm font-medium">{error}</p>
+          </div>
+        )}
       </div>
     </div>
   );

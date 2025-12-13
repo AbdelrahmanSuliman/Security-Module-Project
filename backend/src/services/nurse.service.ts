@@ -2,6 +2,7 @@ import prisma from "../prisma";
 import { logger } from "../utils/logger";
 import { NotFoundError, UnauthorizedError } from "../utils/errors";
 import { writeAuditLog } from "../utils/audit";
+import { decrypt } from "../utils/encryptor";
 
 export const getAssignedPatientsService = async (
   nurseId: string,
@@ -53,7 +54,9 @@ export const getAssignedPatientsService = async (
   const patients = await prisma.patientRecord.findMany({
     where: { doctorId: { in: doctorIds } },
     include: {
-      patient: { select: { id: true, name: true, email: true, diagnosis: true } },
+      patient: {
+        select: { id: true, name: true, email: true, diagnosis: true },
+      },
       doctor: { select: { id: true, name: true } },
       medications: {
         include: { nurseChecks: { where: { nurseId }, select: { id: true } } },
@@ -64,16 +67,16 @@ export const getAssignedPatientsService = async (
   const formattedPatients = patients.map((p) => ({
     recordId: p.id,
     patientId: p.patient.id,
-    patientName: p.patient.name,
-    patientEmail: p.patient.email,
-    diagnosis: p.patient.diagnosis,
+    patientName: decrypt(p.patient.name),
+    patientEmail: decrypt(p.patient.email),
+    diagnosis: p.patient.diagnosis ? decrypt(p.patient.diagnosis) : null,
     doctorId: p.doctor.id,
-    doctorName: p.doctor.name,
+    doctorName: decrypt(p.doctor.name),
     medications: p.medications.map((m) => ({
       id: m.id,
-      name: m.name,
-      dosage: m.dosage,
-      schedule: m.schedule,
+      name: decrypt(m.name),
+      dosage: decrypt(m.dosage),
+      schedule: decrypt(m.schedule),
       checked: m.nurseChecks.length > 0,
     })),
   }));

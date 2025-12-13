@@ -1,7 +1,8 @@
-import { generateToken } from './../middleware/generateToken.middleware';
+import { generateToken } from "./../middleware/generateToken.middleware";
 import prisma from "../prisma";
 import { logger } from "../utils/logger";
 import bcrypt from "bcrypt";
+import { sendEmail } from "../utils/sendEmail";
 import {
   changePasswordError,
   ConflictError,
@@ -122,6 +123,7 @@ export const resetPasswordService = async (
     where: { id: user.id },
     data: { password: hashedPassword },
   });
+  
 
   await prisma.passwordResetCode.delete({ where: { userId: user.id } });
 
@@ -153,7 +155,6 @@ export const loginService = async (
     const user = await prisma.user.findUnique({ where: { email } });
     const THIRTY_DAYS_MS = 30 * 24 * 60 * 60 * 1000;
     const now = new Date();
-    
 
     if (!user) {
       logger.warn({ event: "LOGIN_FAILED_NOT_FOUND", email: maskEmail(email) });
@@ -202,8 +203,6 @@ export const loginService = async (
 
       throw new UnauthorizedError("Invalid email or password");
     }
-
-
 
     logger.info({ event: "LOGIN_SUCCESS", userId: user.id });
 
@@ -262,7 +261,6 @@ export const initiateLoginService = async (
     throw new UnauthorizedError("Invalid email or password");
   }
 
-  // --- Generate 2FA code ---
   const code = crypto.randomInt(100000, 999999).toString();
   const expiresAt = new Date(Date.now() + 10 * 60 * 1000);
 
@@ -313,4 +311,3 @@ export const verifyLoginCodeService = async (
     role: user.role,
   };
 };
-

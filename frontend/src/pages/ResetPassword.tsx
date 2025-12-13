@@ -67,18 +67,18 @@ export default function ResetPassword() {
   };
 
   return (
-    <div className="w-screen h-screen flex items-center justify-center bg-gray-50">
-      <div className="border border-gray-300 rounded-xl shadow-lg w-96 p-8 bg-white">
-        <h1 className="text-2xl font-semibold text-center mb-6">
+    <div className="w-screen h-screen flex items-center justify-center bg-[#F7F9FC]">
+      <div className="border border-[#D1D5DB] rounded-lg shadow-md w-full max-w-md p-8 md:p-10 bg-white">
+        <h1 className="text-3xl font-bold text-[#1F2937] text-center mb-8">
           Reset Password
         </h1>
 
         {step === "request" ? (
-          <form onSubmit={handleRequest} className="flex flex-col gap-4">
+          <form onSubmit={handleRequest} className="flex flex-col gap-5">
             <input
               type="email"
               placeholder="Enter your email"
-              className="border border-gray-300 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
+              className="border border-[#D1D5DB] rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-[#0096C7] focus:border-transparent text-[#1F2937] placeholder:text-[#4B5563] transition-all"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
@@ -87,7 +87,7 @@ export default function ResetPassword() {
             <button
               type="submit"
               disabled={requestResetMutation.isPending}
-              className="bg-blue-500 text-white rounded-lg p-2 hover:bg-blue-600 transition disabled:opacity-50"
+              className="bg-[#0096C7] hover:bg-[#023E8A] text-white rounded-lg p-3 font-medium transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed shadow-sm hover:shadow-md"
             >
               {requestResetMutation.isPending
                 ? "Sending..."
@@ -95,11 +95,11 @@ export default function ResetPassword() {
             </button>
           </form>
         ) : (
-          <form onSubmit={handleReset} className="flex flex-col gap-4">
+          <form onSubmit={handleReset} className="flex flex-col gap-5">
             <input
               type="text"
               placeholder="Enter reset code"
-              className="border border-gray-300 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
+              className="border border-[#D1D5DB] rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-[#0096C7] focus:border-transparent text-[#1F2937] placeholder:text-[#4B5563] transition-all"
               value={code}
               onChange={(e) => setCode(e.target.value)}
               required
@@ -108,7 +108,7 @@ export default function ResetPassword() {
             <input
               type="password"
               placeholder="New password"
-              className="border border-gray-300 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
+              className="border border-[#D1D5DB] rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-[#0096C7] focus:border-transparent text-[#1F2937] placeholder:text-[#4B5563] transition-all"
               value={newPassword}
               onChange={(e) => setNewPassword(e.target.value)}
               required
@@ -117,7 +117,7 @@ export default function ResetPassword() {
             <button
               type="submit"
               disabled={resetPasswordMutation.isPending}
-              className="bg-green-500 text-white rounded-lg p-2 hover:bg-green-600 transition disabled:opacity-50"
+              className="bg-[#7DD87D] hover:bg-[#48B7A5] text-white rounded-lg p-3 font-medium transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed shadow-sm hover:shadow-md"
             >
               {resetPasswordMutation.isPending
                 ? "Resetting..."
@@ -127,31 +127,38 @@ export default function ResetPassword() {
         )}
 
         {backendMessage && (
-          <p
-            className={`mt-4 text-center text-sm ${
+          <div className={`mt-5 p-3 rounded-lg ${
+            backendMessage.includes("successful")
+              ? "bg-[#2ECC71]/10 border border-[#2ECC71]"
+              : "bg-[#E74C3C]/10 border border-[#E74C3C]"
+          }`}>
+            <p className={`text-center text-sm font-medium ${
               backendMessage.includes("successful")
-                ? "text-green-600"
-                : "text-red-500"
-            }`}
-          >
-            {backendMessage}
-          </p>
-        )}
-
-        {backendErrors.length > 0 && (
-          <div className="mt-4 text-red-500 text-sm space-y-1 text-left">
-            {backendErrors.map((err, idx) => (
-              <p key={idx}>• {err}</p>
-            ))}
+                ? "text-[#2ECC71]"
+                : "text-[#E74C3C]"
+            }`}>
+              {backendMessage}
+            </p>
           </div>
         )}
 
-        <p
-          className="text-center text-blue-400 hover:text-blue-600 mt-6 cursor-pointer"
+        {backendErrors.length > 0 && (
+          <div className="mt-5 p-3 bg-[#E74C3C]/10 border border-[#E74C3C] rounded-lg">
+            <div className="text-[#E74C3C] text-sm space-y-1">
+              {backendErrors.map((err, idx) => (
+                <p key={idx}>• {err}</p>
+              ))}
+            </div>
+          </div>
+        )}
+
+        <button
+          type="button"
+          className="text-center text-[#0096C7] hover:text-[#023E8A] mt-6 cursor-pointer font-medium transition-colors duration-200"
           onClick={() => navigate("/login")}
         >
           Back to Login
-        </p>
+        </button>
       </div>
     </div>
   );

@@ -72,33 +72,35 @@ function LoginPage() {
   };
 
   return (
-    <div className="w-screen h-screen flex items-center justify-center">
-      <div className="border-2 border-gray-300 rounded-lg w-96 shadow-lg h-auto p-8">
-        <h1 className="text-2xl p-8 text-center">HealthCureAlpha Login</h1>
+    <div className="w-screen h-screen flex items-center justify-center bg-[#F7F9FC]">
+      <div className="border border-[#D1D5DB] rounded-lg w-full max-w-md shadow-md bg-white p-8 md:p-10">
+        <h1 className="text-3xl font-bold text-[#1F2937] mb-8 text-center">HealthCureAlpha Login</h1>
 
         <form
           onSubmit={handleSubmit}
-          className="flex flex-col space-y-4 mt-4 gap-4"
+          className="flex flex-col space-y-5"
         >
           <input
             type="email"
             placeholder="Email"
-            className="border border-gray-300 p-2 rounded"
+            className="border border-[#D1D5DB] p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0096C7] focus:border-transparent text-[#1F2937] placeholder:text-[#4B5563] transition-all"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
+            required
           />
 
           <input
             type="password"
             placeholder="Password"
-            className="border border-gray-300 p-2 rounded"
+            className="border border-[#D1D5DB] p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0096C7] focus:border-transparent text-[#1F2937] placeholder:text-[#4B5563] transition-all"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
+            required
           />
 
           <button
             type="submit"
-            className="bg-blue-500 text-white p-2 rounded hover:bg-blue-600 hover:cursor-pointer disabled:opacity-50"
+            className="bg-[#0096C7] hover:bg-[#023E8A] text-white p-3 rounded-lg font-medium transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed shadow-sm hover:shadow-md"
             disabled={loginMutation.isPending}
           >
             {loginMutation.isPending ? "Logging in..." : "Login"}
@@ -106,19 +108,22 @@ function LoginPage() {
         </form>
 
         {backendErrors.length > 0 && (
-          <div className="mt-4 text-red-500 text-sm space-y-1 text-center">
-            {backendErrors.map((err, idx) => (
-              <p key={idx}>{err}</p>
-            ))}
+          <div className="mt-5 p-3 bg-[#E74C3C]/10 border border-[#E74C3C] rounded-lg">
+            <div className="text-[#E74C3C] text-sm space-y-1 text-center">
+              {backendErrors.map((err, idx) => (
+                <p key={idx}>{err}</p>
+              ))}
+            </div>
           </div>
         )}
 
-        <h1
-          className="text-center text-blue-400 hover:text-blue-600 p-4 hover:cursor-pointer"
+        <button
+          type="button"
+          className="text-center text-[#0096C7] hover:text-[#023E8A] p-4 mt-6 cursor-pointer font-medium transition-colors duration-200"
           onClick={() => navigate("/reset-password")}
         >
           Forgot Password?
-        </h1>
+        </button>
       </div>
     </div>
   );
