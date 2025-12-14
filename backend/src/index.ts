@@ -8,17 +8,34 @@ import cors from "cors";
 import fs from "fs";
 import https from "https";
 import cookieParser from "cookie-parser";
+import helmet from "helmet";
 
 const app = express();
 const port = 3000;
+
 app.use(cookieParser());
 app.use(express.json());
-app.use(express.json());
 
-app.use(cors({
-  origin: "https://localhost:5173",
-  credentials: true,
-}));
+app.use(
+  helmet({
+    contentSecurityPolicy: {
+      directives: {
+        defaultSrc: ["'self'"],
+        scriptSrc: ["'self'"],
+        styleSrc: ["'self'", "'unsafe-inline'"],
+        imgSrc: ["'self'", "data:"],
+        connectSrc: ["'self'", "https://localhost:5173"],
+      },
+    },
+  })
+);
+
+app.use(
+  cors({
+    origin: "https://localhost:5173",
+    credentials: true,
+  })
+);
 
 app.use("/api/auth", authRoutes);
 app.use("/api/doctors", doctorRoutes);

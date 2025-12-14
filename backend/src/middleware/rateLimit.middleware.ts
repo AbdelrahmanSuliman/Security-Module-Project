@@ -7,3 +7,12 @@ export const loginRateLimiter = rateLimit({
   standardHeaders: true,
   legacyHeaders: false,
 });
+
+
+export const mfaRateLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, 
+  max: 20, 
+  message: { message: "Too many MFA attempts. Please try again later." },
+  standardHeaders: true,
+  legacyHeaders: false,
+});

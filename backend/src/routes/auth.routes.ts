@@ -3,12 +3,12 @@ import { Router } from "express";
 import * as authController from "../controllers/auth.controller";
 import { validate } from "../middleware/validate.middleware";
 import { passwordResetSchema } from "../types/resetPassword.type";
-import { loginRateLimiter } from '../middleware/rateLimit.middleware';
+import { loginRateLimiter, mfaRateLimiter } from '../middleware/rateLimit.middleware';
 
 const router = Router();
 
 router.post("/login", loginRateLimiter, initiateLoginController);
-router.post("/login/verify", loginRateLimiter, verifyLoginCodeController);
+router.post("/login/verify", mfaRateLimiter, verifyLoginCodeController);
 router.post("/logout", authController.logoutController);
 
 

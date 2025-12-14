@@ -16,15 +16,11 @@ export const createDoctorService = async (
   try {
     logger.info({ event: "CREATE_DOCTOR_ATTEMPT", email });
 
-    const allUsers = await prisma.user.findMany();
-    const emailExists = allUsers.some((user) => {
-      try {
-        const decryptedEmail = decrypt(user.email);
-        return decryptedEmail === email;
-      } catch {
-        return user.email === email;
-      }
+    const emailExists = await prisma.user.findUnique({
+      where: { email },
+      select: { id: true },
     });
+
 
     if (emailExists) throw new AppError("Email already in use", 400);
 
@@ -89,14 +85,9 @@ export const createNurseService = async (
     if (!doctor || doctor.role !== "DOCTOR")
       throw new NotFoundError("Doctor not found");
 
-    const allUsers = await prisma.user.findMany();
-    const emailExists = allUsers.some((user) => {
-      try {
-        const decryptedEmail = decrypt(user.email);
-        return decryptedEmail === email;
-      } catch {
-        return user.email === email;
-      }
+    const emailExists = await prisma.user.findUnique({
+      where: { email },
+      select: { id: true },
     });
 
     if (emailExists) throw new AppError("Email already in use", 400);

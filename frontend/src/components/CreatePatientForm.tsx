@@ -127,7 +127,7 @@ export default function CreatePatientForm() {
         />
         <input
           type="text"
-          placeholder="Diagnosis (optional)"
+          placeholder="Diagnosis"
           className="w-full border border-[#D1D5DB] p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0096C7] focus:border-transparent text-[#1F2937] placeholder:text-[#4B5563] transition-all"
           value={formData.diagnosis}
           onChange={(e) =>

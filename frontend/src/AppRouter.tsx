@@ -26,11 +26,7 @@ export default function AppRouter() {
       <Route
         path="/reset-password"
         element={
-          <ProtectedRoute
-            allowedRoles={["ADMIN", "DOCTOR", "NURSE", "PATIENT"]}
-          >
             <ResetPassword />
-          </ProtectedRoute>
         }
       />
 

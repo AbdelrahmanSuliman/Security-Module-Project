@@ -42,7 +42,6 @@ export default function ResetPassword() {
       const data = error.response?.data;
 
       if (Array.isArray(data?.errors)) {
-        // Extract Zod validation messages
         setBackendErrors(data.errors.map((err: any) => `${err.field}: ${err.message}`));
       } else if (data?.message) {
         setBackendMessage(data.message);

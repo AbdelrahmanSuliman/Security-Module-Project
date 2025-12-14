@@ -51,9 +51,6 @@ export function NurseDashboard() {
                     <strong className="font-semibold">Patient:</strong> <span className="text-[#4B5563]">{p.patientName}</span>
                   </p>
                   <p className="text-[#1F2937]">
-                    <strong className="font-semibold">Email:</strong> <span className="text-[#4B5563]">{p.patientEmail}</span>
-                  </p>
-                  <p className="text-[#1F2937]">
                     <strong className="font-semibold">Diagnosis:</strong> <span className="text-[#4B5563]">{p.diagnosis || "N/A"}</span>
                   </p>
                   <p className="text-[#1F2937]">
