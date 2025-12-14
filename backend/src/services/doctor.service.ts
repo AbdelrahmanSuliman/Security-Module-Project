@@ -106,7 +106,7 @@ export const getDoctorPatientsService = async (
   const decryptedPatients = patients.map((p) => ({
     ...p,
     name: decrypt(p.name),
-    email: decrypt(p.email),
+    email: p.email,
     diagnosis: p.diagnosis ? decrypt(p.diagnosis) : null,
     patientRecord: {
       ...p.patientRecord,
@@ -154,7 +154,7 @@ export const createPatientService = async (
   ip?: string,
   userAgent?: string
 ) => {
-  logger.info({ doctorId, event: "CREATE_PATIENT_ATTEMPT", patientData });
+  logger.info({ doctorId, event: "CREATE_PATIENT_ATTEMPT"});
 
   const doctor = await prisma.user.findUnique({
     where: { id: doctorId },

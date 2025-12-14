@@ -12,7 +12,7 @@ export const createPatientSchema = z.object({
     .regex(/[0-9]/, "Password must contain at least one number")
     .regex(/[^a-zA-Z0-9]/, "Password must contain at least one special character")
     .regex(/^\S+$/, "Password must not contain spaces"),
-  diagnosis: z.string().min(3).optional(),
+  diagnosis: z.string().min(3),
 
   notes: z
     .array(
